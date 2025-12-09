@@ -1,39 +1,24 @@
-:- dynamic board/1.
-:- use_module(library(random)).
+:- module(game, [
+    init_game/1,
+    play/2,
+    play_move/4,
+    test_win/4,
+    match_nul/1,
+    legal_move/2,
+    change_player/2,
+    display_board/1,
+    human_move/2,
+    get_cell/4
+]).
+
+:- use_module(library(lists)).
 :- use_module(library(readutil)).
-
-% Point d entrée : lance une partie avec l IA aléatoire en '\U0001F534'
-init :-
-    retractall(board(_)),
-    Board = [[], [], [], [], [], [], []],
-    assert(board(Board)),
-    display_board,
-    play('\U0001F534').
-
-play(Player) :-
-    board(Board),
-    (   match_nul(Board)
-    ->  writeln('Match nul !')
-    ;   format('Tour de ~w~n', [Player]),
-        (   Player = '\U0001F534'
-        ->  ia(Board, Move, Player)
-        ;   human_move(Board, Move)
-        ),
-        play_move(Board, Move, NewBoard, Player),
-        apply_board(Board, NewBoard),
-        nth0(Move, NewBoard, ColumnAfter),
-        length(ColumnAfter, H),
-        Row is H - 1,
-        display_board,
-        (   test_win(NewBoard, Player, Move, Row)
-        ->  format('~w gagne !~n', [Player])
-        ;   change_player(Player, NextPlayer),
-            play(NextPlayer)
-        )
-    ).
 
 change_player('\U0001F534', '\U0001F7E1').
 change_player('\U0001F7E1', '\U0001F534').
+
+init_game(Board) :-
+    Board = [[], [], [], [], [], [], []].
 
 display_row(Board, Row) :-
     display_row_cols(Board, Row, 0),
@@ -52,49 +37,18 @@ display_row_cols(Board, Row, Col) :-
 display_row_cols(_, _, Col) :-
     Col > 6.
 
-print_colored_cell('\U0001F534') :-
-    write('\U0001F534').
-print_colored_cell('\U0001F7E1') :-
-    write('\U0001F7E1').
-print_colored_cell(Cell) :-
-    write(Cell).
-
-display_board :-
-    board(Board),
+display_board(Board) :-
     forall(between(0, 5, R0),
            (   Row is 5 - R0,
                display_row(Board, Row)
            )),
     writeln('\u0030\uFE0F\u20E3  \u0031\uFE0F\u20E3  \u0032\uFE0F\u20E3  \u0033\uFE0F\u20E3  \u0034\uFE0F\u20E3  \u0035\uFE0F\u20E3  \u0036\uFE0F\u20E3').
 
-ia(Board, Col, Player) :-
-    (   find_winning_move(Board, Player, WinCol)
-    ->  Col = WinCol
-    ;   change_player(Player, Opponent),
-        find_winning_move(Board, Opponent, BlockCol)
-    ->  Col = BlockCol
-    ;   ia_random(Board, Col)
-    ).
-
-find_winning_move(Board, Player, Col) :-
+legal_move(Board, Col) :-
     between(0, 6, Col),
     nth0(Col, Board, Column),
     length(Column, H),
-    H < 6,
-    play_move(Board, Col, TestBoard, Player),
-    nth0(Col, TestBoard, ColumnAfter),
-    length(ColumnAfter, NewH),
-    Row is NewH - 1,
-    test_win(TestBoard, Player, Col, Row),
-    !.
-
-ia_random(Board, Col) :-
-    repeat,
-    random_between(0, 6, Col),
-    nth0(Col, Board, Column),
-    length(Column, H),
-    H < 6,
-    !.
+    H < 6.
 
 play_move(Board, ColIndex, NewBoard, Player) :-
     nth0(ColIndex, Board, Column),
@@ -109,15 +63,11 @@ replace_nth0(I, [H|T], X, [H|R]) :-
     I1 is I - 1,
     replace_nth0(I1, T, X, R).
 
-apply_board(Board, NewBoard) :-
-    retract(board(Board)),
-    assert(board(NewBoard)).
-
 test_win(Board, Player, Col, Row) :-
-    (   check_direction(Board, Player, Col, Row, 1, 0)     % horizontal
-    ;   check_direction(Board, Player, Col, Row, 0, 1)     % vertical
-    ;   check_direction(Board, Player, Col, Row, 1, 1)     % diagonale /
-    ;   check_direction(Board, Player, Col, Row, 1, -1)    % diagonale \
+    (   check_direction(Board, Player, Col, Row, 1, 0)
+    ;   check_direction(Board, Player, Col, Row, 0, 1)
+    ;   check_direction(Board, Player, Col, Row, 1, 1)
+    ;   check_direction(Board, Player, Col, Row, 1, -1)
     ).
 
 check_direction(Board, Player, Col, Row, DX, DY) :-
@@ -162,3 +112,27 @@ human_move(Board, Col) :-
 match_nul(Board) :-
     \+ (member(Column, Board), length(Column, L), L < 6).
 
+play(IAModule, FirstPlayer) :-
+    init_game(Board),
+    display_board(Board),
+    play_loop(Board, FirstPlayer, IAModule).
+
+play_loop(Board, Player, IAModule) :-
+    (   match_nul(Board)
+    ->  writeln('Match nul !')
+    ;   format('Tour de ~w~n', [Player]),
+        (   Player = '\U0001F534'
+        ->  IAModule:ia(Board, Move, Player)
+        ;   human_move(Board, Move)
+        ),
+        play_move(Board, Move, NewBoard, Player),
+        nth0(Move, NewBoard, ColumnAfter),
+        length(ColumnAfter, H),
+        Row is H - 1,
+        display_board(NewBoard),
+        (   test_win(NewBoard, Player, Move, Row)
+        ->  format('~w gagne !~n', [Player])
+        ;   change_player(Player, NextPlayer),
+            play_loop(NewBoard, NextPlayer, IAModule)
+        )
+    ).
