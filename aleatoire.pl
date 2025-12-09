@@ -10,6 +10,9 @@ init :-
     display_board,
     play('x').
 
+
+
+
 play(Player) :-
     board(Board),
     (   match_nul(Board)
@@ -32,6 +35,33 @@ play(Player) :-
         )
     ).
 
+% Entrée pour partie Humain vs Humain 
+init_hvh :-
+    retractall(board(_)),
+    Board = [[], [], [], [], [], [], []],
+    assert(board(Board)),
+    display_board,
+    play_hvh('x').
+
+% Boucle de jeu pour Humain vs Humain
+play_hvh(Player) :-
+    board(Board),
+    (   match_nul(Board)
+    ->  writeln('Match nul !')
+    ;   format('Tour de ~w~n', [Player]),
+        human_move(Board, Move),
+        play_move(Board, Move, NewBoard, Player),
+        apply_board(Board, NewBoard),
+        nth0(Move, NewBoard, ColumnAfter),
+        length(ColumnAfter, H),
+        Row is H - 1,
+        display_board,
+        (   test_win(NewBoard, Player, Move, Row)
+        ->  format('~w gagne !~n', [Player])
+        ;   change_player(Player, NextPlayer),
+            play_hvh(NextPlayer)
+        )
+    ).
 change_player('x', 'o').
 change_player('o', 'x').
 
