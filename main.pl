@@ -31,8 +31,9 @@ menu :-
     writeln('2. IA Aleatoire Plus  - Gagne et bloque'),
     writeln('3. IA Minimax         - Strategie avancee'),
     writeln('4. Quitter'),
+    writeln('5. Lancer les tests'),
     writeln(''),
-    write('Votre choix (1-4) : '),
+    write('Votre choix (1-5) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, Choice),
@@ -55,6 +56,11 @@ handle_choice(3) :-
     menu.
 handle_choice(4) :-
     writeln('Au revoir!').
+handle_choice(5) :-
+    writeln('Chargement des tests...'),
+    consult('test_game.pl'),
+    run_tests,
+    menu.
 handle_choice(_) :-
     writeln('Choix invalide!'),
     menu.
