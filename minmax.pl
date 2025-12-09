@@ -2,20 +2,20 @@
 :- use_module(library(lists)).
 :- use_module(library(readutil)).
 
-% Point d'entrée : lance une partie avec l'IA minimax en '🔴'
+% Point d'entrée : lance une partie avec l'IA minimax en '\U0001F534'
 init :-
     retractall(board(_)),
     Board = [[], [], [], [], [], [], []],
     assert(board(Board)),
     display_board,
-    play('🔴').
+    play('\U0001F534').
 
 play(Player) :-
     board(Board),
     (   match_nul(Board)
     ->  writeln('Match nul !')
     ;   format('Tour de ~w~n', [Player]),
-        (   Player = '🔴'
+        (   Player = '\U0001F534'
         ->  ia(Board, Move, Player)
         ;   human_move(Board, Move)
         ),
@@ -32,8 +32,8 @@ play(Player) :-
         )
     ).
 
-change_player('🔴', '🟡').
-change_player('🟡', '🔴').
+change_player('\U0001F534', '\U0001F7E1').
+change_player('\U0001F7E1', '\U0001F534').
 
 display_row(Board, Row) :-
     display_row_cols(Board, Row, 0),
@@ -44,7 +44,7 @@ display_row_cols(Board, Row, Col) :-
     nth0(Col, Board, Column),
     (   nth0(Row, Column, Cell)
     ->  write(Cell)
-    ;   write('⚪')
+    ;   write('\u26AA')
     ),
     write(' '),
     NextCol is Col + 1,
@@ -52,10 +52,10 @@ display_row_cols(Board, Row, Col) :-
 display_row_cols(_, _, Col) :-
     Col > 6.
 
-print_colored_cell('🔴') :-
-    write('🔴').
-print_colored_cell('🟡') :-
-    write('🟡').
+print_colored_cell('\U0001F534') :-
+    write('\U0001F534').
+print_colored_cell('\U0001F7E1') :-
+    write('\U0001F7E1').
 print_colored_cell(Cell) :-
     write(Cell).
 
@@ -78,8 +78,8 @@ legal_move(Board, Col) :-
 
 minimax(Board, _Player, Depth, Score, -1) :-
     (   Depth =:= 0
-    ;   win_player(Board, '🔴')
-    ;   win_player(Board, '🟡')
+    ;   win_player(Board, '\U0001F534')
+    ;   win_player(Board, '\U0001F7E1')
     ;   board_full(Board)
     ),
     eval_board(Board, Score),
@@ -94,7 +94,7 @@ minimax(Board, Player, Depth, BestScore, BestCol) :-
                 minimax(NextBoard, NextPlayer, Depth1, Score, _)
             ),
             MovesScores),
-    (   Player = '🔴'
+    (   Player = '\U0001F534'
     ->  best_max(MovesScores, BestScore, BestCol)
     ;   best_min(MovesScores, BestScore, BestCol)
     ).
@@ -125,9 +125,9 @@ ia(Board, Col, Player) :-
     !.
 
 eval_board(Board, Score) :-
-    (   win_player(Board, '🔴')
+    (   win_player(Board, '\U0001F534')
     ->  Score = 100000
-    ;   win_player(Board, '🟡')
+    ;   win_player(Board, '\U0001F7E1')
     ->  Score = -100000
     ;   heuristic(Board, Score)
     ).
@@ -140,13 +140,13 @@ win_player(Board, Player) :-
 
 heuristic(Board, Score) :-
     findall(Wx,
-            (   any_cell(Board, '🔴', Col, Row),
+            (   any_cell(Board, '\U0001F534', Col, Row),
                 cell_weight(Row, Col, Wx)
             ),
             Lx),
     sum_list(Lx, SX),
     findall(Wo,
-            (   any_cell(Board, '🟡', Col2, Row2),
+            (   any_cell(Board, '\U0001F7E1', Col2, Row2),
                 cell_weight(Row2, Col2, Wo)
             ),
             Lo),
