@@ -1,8 +1,8 @@
 :- dynamic board/1.
-:- use_module(library(lists)).
+:- use_module(library(random)).
 :- use_module(library(readutil)).
 
-% Point d'entrée : lance une partie avec l'IA minimax en 'x'
+% Point d entrée : lance une partie avec l IA aléatoire en 'x'
 init :-
     retractall(board(_)),
     Board = [[], [], [], [], [], [], []],
@@ -67,111 +67,34 @@ display_board :-
            )),
     writeln('0 1 2 3 4 5 6').
 
-% --- Minimax ---------------------------------------------------------------
-board_full(Board) :-
-    match_nul(Board).
+ia(Board, Col, Player) :-
+    (   find_winning_move(Board, Player, WinCol)
+    ->  Col = WinCol
+    ;   change_player(Player, Opponent),
+        find_winning_move(Board, Opponent, BlockCol)
+    ->  Col = BlockCol
+    ;   ia_random(Board, Col)
+    ).
 
-legal_move(Board, Col) :-
+find_winning_move(Board, Player, Col) :-
+    between(0, 6, Col),
     nth0(Col, Board, Column),
     length(Column, H),
-    H < 6.
-
-minimax(Board, _Player, Depth, Score, -1) :-
-    (   Depth =:= 0
-    ;   win_player(Board, 'x')
-    ;   win_player(Board, 'o')
-    ;   board_full(Board)
-    ),
-    eval_board(Board, Score),
-    !.
-minimax(Board, Player, Depth, BestScore, BestCol) :-
-    Depth > 0,
-    Depth1 is Depth - 1,
-    findall(Score-Col,
-            (   legal_move(Board, Col),
-                play_move(Board, Col, NextBoard, Player),
-                change_player(Player, NextPlayer),
-                minimax(NextBoard, NextPlayer, Depth1, Score, _)
-            ),
-            MovesScores),
-    (   Player = 'x'
-    ->  best_max(MovesScores, BestScore, BestCol)
-    ;   best_min(MovesScores, BestScore, BestCol)
-    ).
-
-best_max([S-C], S, C).
-best_max([S-C|Rest], BestScore, BestCol) :-
-    best_max(Rest, CurScore, CurCol),
-    (   S > CurScore
-    ->  BestScore = S, BestCol = C
-    ;   BestScore = CurScore, BestCol = CurCol
-    ).
-
-best_min([S-C], S, C).
-best_min([S-C|Rest], BestScore, BestCol) :-
-    best_min(Rest, CurScore, CurCol),
-    (   S < CurScore
-    ->  BestScore = S, BestCol = C
-    ;   BestScore = CurScore, BestCol = CurCol
-    ).
-
-ia(Board, Col, Player) :-
-    Depth = 4,
-    minimax(Board, Player, Depth, _Score, BestCol),
-    (   BestCol =:= -1
-    ->  findall(C, legal_move(Board, C), [Col|_])
-    ;   Col = BestCol
-    ),
+    H < 6,
+    play_move(Board, Col, TestBoard, Player),
+    nth0(Col, TestBoard, ColumnAfter),
+    length(ColumnAfter, NewH),
+    Row is NewH - 1,
+    test_win(TestBoard, Player, Col, Row),
     !.
 
-eval_board(Board, Score) :-
-    (   win_player(Board, 'x')
-    ->  Score = 100000
-    ;   win_player(Board, 'o')
-    ->  Score = -100000
-    ;   heuristic(Board, Score)
-    ).
-
-win_player(Board, Player) :-
+ia_random(Board, Col) :-
+    repeat,
+    random_between(0, 6, Col),
     nth0(Col, Board, Column),
-    nth0(Row, Column, Player),
-    test_win(Board, Player, Col, Row),
+    length(Column, H),
+    H < 6,
     !.
-
-heuristic(Board, Score) :-
-    findall(Wx,
-            (   any_cell(Board, 'x', Col, Row),
-                cell_weight(Row, Col, Wx)
-            ),
-            Lx),
-    sum_list(Lx, SX),
-    findall(Wo,
-            (   any_cell(Board, 'o', Col2, Row2),
-                cell_weight(Row2, Col2, Wo)
-            ),
-            Lo),
-    sum_list(Lo, SO),
-    Score is SX - SO.
-
-any_cell(Board, Player, Col, Row) :-
-    nth0(Col, Board, Column),
-    nth0(Row, Column, Player).
-
-cell_weight_matrix([
-    [3, 4, 5, 7, 5, 4, 3],
-    [4, 6, 8, 10, 8, 6, 4],
-    [5, 8, 11, 14, 11, 8, 5],
-    [5, 8, 11, 14, 11, 8, 5],
-    [4, 6, 8, 10, 8, 6, 4],
-    [3, 4, 5, 7, 5, 4, 3]
-]).
-
-cell_weight(Row, Col, W) :-
-    cell_weight_matrix(Matrix),
-    nth0(Row, Matrix, Line),
-    nth0(Col, Line, W).
-
-% --- Moteur de jeu commun ---------------------------------------------------
 
 play_move(Board, ColIndex, NewBoard, Player) :-
     nth0(ColIndex, Board, Column),
