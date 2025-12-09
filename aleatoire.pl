@@ -2,7 +2,7 @@
 :- use_module(library(random)).
 :- use_module(library(readutil)).
 
-% Point d'entrée : lance une partie avec l'IA aléatoire en 'x'
+% Point d entrée : lance une partie avec l IA aléatoire en 'x'
 init :-
     retractall(board(_)),
     Board = [[], [], [], [], [], [], []],
@@ -43,7 +43,7 @@ display_row_cols(Board, Row, Col) :-
     Col =< 6,
     nth0(Col, Board, Column),
     (   nth0(Row, Column, Cell)
-    ->  write(Cell)
+    ->  print_colored_cell(Cell)
     ;   write('_')
     ),
     write(' '),
@@ -51,6 +51,13 @@ display_row_cols(Board, Row, Col) :-
     display_row_cols(Board, Row, NextCol).
 display_row_cols(_, _, Col) :-
     Col > 6.
+
+print_colored_cell('x') :-
+    write('\e[33mx\e[0m').
+print_colored_cell('o') :-
+    write('\e[31mo\e[0m').
+print_colored_cell(Cell) :-
+    write(Cell).
 
 display_board :-
     board(Board),
