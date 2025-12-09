@@ -2,20 +2,20 @@
 :- use_module(library(random)).
 :- use_module(library(readutil)).
 
-% Point d entrée : lance une partie avec l IA aléatoire en 'x'
+% Point d entrée : lance une partie avec l IA aléatoire en '\U0001F534'
 init :-
     retractall(board(_)),
     Board = [[], [], [], [], [], [], []],
     assert(board(Board)),
     display_board,
-    play('x').
+    play('\U0001F534').
 
 play(Player) :-
     board(Board),
     (   match_nul(Board)
     ->  writeln('Match nul !')
     ;   format('Tour de ~w~n', [Player]),
-        (   Player = 'x'
+        (   Player = '\U0001F534'
         ->  ia(Board, Move, Player)
         ;   human_move(Board, Move)
         ),
@@ -32,8 +32,8 @@ play(Player) :-
         )
     ).
 
-change_player('x', 'o').
-change_player('o', 'x').
+change_player('\U0001F534', '\U0001F7E1').
+change_player('\U0001F7E1', '\U0001F534').
 
 display_row(Board, Row) :-
     display_row_cols(Board, Row, 0),
@@ -43,8 +43,8 @@ display_row_cols(Board, Row, Col) :-
     Col =< 6,
     nth0(Col, Board, Column),
     (   nth0(Row, Column, Cell)
-    ->  print_colored_cell(Cell)
-    ;   write('_')
+    ->  write(Cell)
+    ;   write('\u26AA')
     ),
     write(' '),
     NextCol is Col + 1,
@@ -52,10 +52,10 @@ display_row_cols(Board, Row, Col) :-
 display_row_cols(_, _, Col) :-
     Col > 6.
 
-print_colored_cell('x') :-
-    write('\e[33mx\e[0m').
-print_colored_cell('o') :-
-    write('\e[31mo\e[0m').
+print_colored_cell('\U0001F534') :-
+    write('\U0001F534').
+print_colored_cell('\U0001F7E1') :-
+    write('\U0001F7E1').
 print_colored_cell(Cell) :-
     write(Cell).
 
@@ -65,7 +65,7 @@ display_board :-
            (   Row is 5 - R0,
                display_row(Board, Row)
            )),
-    writeln('0 1 2 3 4 5 6').
+    writeln('\u0030\uFE0F\u20E3  \u0031\uFE0F\u20E3  \u0032\uFE0F\u20E3  \u0033\uFE0F\u20E3  \u0034\uFE0F\u20E3  \u0035\uFE0F\u20E3  \u0036\uFE0F\u20E3').
 
 ia(Board, Col, Player) :-
     (   find_winning_move(Board, Player, WinCol)
