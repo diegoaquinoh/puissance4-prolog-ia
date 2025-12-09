@@ -216,8 +216,9 @@ get_cell(Board, Col, Row, Cell) :-
 human_move(Board, Col) :-
     repeat,
     write('Colonne (0-6) : '),
-    read_line_to_string(user_input, line),
-    (   number_string(Col, line),
+    read_line_to_string(user_input, Line0),
+    normalize_space(atom(Atom), Line0),
+    (   atom_number(Atom, Col),
         integer(Col),
         between(0, 6, Col),
         nth0(Col, Board, Column),
