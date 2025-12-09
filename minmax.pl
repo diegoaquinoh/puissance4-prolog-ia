@@ -238,4 +238,3 @@ human_move(Board, Col) :-
 
 match_nul(Board) :-
     \+ (member(Column, Board), length(Column, L), L < 6).
-

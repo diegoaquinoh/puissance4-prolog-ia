@@ -11,8 +11,6 @@ init :-
     play('\U0001F534').
 
 
-
-
 play(Player) :-
     board(Board),
     (   match_nul(Board)
@@ -171,4 +169,3 @@ human_move(Board, Col) :-
 
 match_nul(Board) :-
     \+ (member(Column, Board), length(Column, L), L < 6).
-
