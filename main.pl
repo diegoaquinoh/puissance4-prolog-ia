@@ -1,22 +1,22 @@
 :- use_module(game).
 
 init_random :-
-    writeln('=== Puissance 4 - IA Aléatoire ==='),
-    writeln('IA: 🔴 (rouge) - Humain: 🟡 (jaune)'),
+    writeln('=== Puissance 4 - IA Aleatoire ==='),
+    writeln('IA: \U0001F534 (rouge) - Humain: \U0001F7E1 (jaune)'),
     nl,
     use_module(ia_random, []),
     play(ia_random, '\U0001F534').
 
 init_random_plus :-
-    writeln('=== Puissance 4 - IA Aléatoire Plus ==='),
-    writeln('IA (gagne + bloque): 🔴 (rouge) - Humain: 🟡 (jaune)'),
+    writeln('=== Puissance 4 - IA Aleatoire Plus ==='),
+    writeln('IA (gagne et bloque): \U0001F534 (rouge) - Humain: \U0001F7E1 (jaune)'),
     nl,
     use_module(ia_random_plus, []),
     play(ia_random_plus, '\U0001F534').
 
 init_minimax :-
     writeln('=== Puissance 4 - IA Minimax ==='),
-    writeln('IA Minimax: 🔴 (rouge) - Humain: 🟡 (jaune)'),
+    writeln('IA Minimax: \U0001F534 (rouge) - Humain: \U0001F7E1 (jaune)'),
     nl,
     use_module(ia_minimax, []),
     play(ia_minimax, '\U0001F534').
@@ -27,9 +27,9 @@ menu :-
     writeln('     PUISSANCE 4 - Choisissez votre IA'),
     writeln('=============================================='),
     writeln(''),
-    writeln('1. IA Aléatoire       - Joue au hasard'),
-    writeln('2. IA Aléatoire Plus  - Gagne et bloque'),
-    writeln('3. IA Minimax         - Stratégie avancée'),
+    writeln('1. IA Aleatoire       - Joue au hasard'),
+    writeln('2. IA Aleatoire Plus  - Gagne et bloque'),
+    writeln('3. IA Minimax         - Strategie avancee'),
     writeln('4. Quitter'),
     writeln(''),
     write('Votre choix (1-4) : '),
