@@ -12,11 +12,6 @@ Le projet est organisé de manière modulaire pour éviter la duplication de cod
 - **`ia_minimax.pl`** : IA minimax avec évaluation heuristique (profondeur 4)
 - **`main.pl`** : Menu interactif pour choisir l'IA
 
-### Anciens fichiers (conservés pour compatibilité)
-- `aleatoire.pl` : Version standalone de l'IA aléatoire
-- `aleatoirePlus.pl` : Version standalone de l'IA aléatoire plus
-- `minmax.pl` : Version standalone de l'IA minimax
-
 ## Lancer une partie
 
 ### Méthode recommandée (avec menu de sélection)
