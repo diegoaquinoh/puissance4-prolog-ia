@@ -65,7 +65,7 @@ display_board :-
            (   Row is 5 - R0,
                display_row(Board, Row)
            )),
-    writeln('0️⃣  1️⃣  2️⃣  3️⃣  4️⃣  5️⃣  6️⃣ ').
+    writeln('\u0030\uFE0F\u20E3  \u0031\uFE0F\u20E3  \u0032\uFE0F\u20E3  \u0033\uFE0F\u20E3  \u0034\uFE0F\u20E3  \u0035\uFE0F\u20E3  \u0036\uFE0F\u20E3').
 
 % --- Minimax ---------------------------------------------------------------
 board_full(Board) :-
