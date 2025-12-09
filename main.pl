@@ -4,21 +4,21 @@ init_random :-
     writeln('=== Puissance 4 - IA Aléatoire ==='),
     writeln('IA: 🔴 (rouge) - Humain: 🟡 (jaune)'),
     nl,
-    use_module(ia_random),
+    use_module(ia_random, []),
     play(ia_random, '\U0001F534').
 
 init_random_plus :-
     writeln('=== Puissance 4 - IA Aléatoire Plus ==='),
     writeln('IA (gagne + bloque): 🔴 (rouge) - Humain: 🟡 (jaune)'),
     nl,
-    use_module(ia_random_plus),
+    use_module(ia_random_plus, []),
     play(ia_random_plus, '\U0001F534').
 
 init_minimax :-
     writeln('=== Puissance 4 - IA Minimax ==='),
     writeln('IA Minimax: 🔴 (rouge) - Humain: 🟡 (jaune)'),
     nl,
-    use_module(ia_minimax),
+    use_module(ia_minimax, []),
     play(ia_minimax, '\U0001F534').
 
 menu :-
