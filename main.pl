@@ -23,6 +23,13 @@ init_minimax :-
     use_module(ia_minimax, []),
     play(ia_minimax, '\U0001F534').
 
+init_alphabeta :-
+    writeln('=== Puissance 4 - IA Minimax ==='),
+    writeln('IA Minimax: \U0001F534 (rouge) - Humain: \U0001F7E1 (jaune)'),
+    nl,
+    use_module(ia_alphabeta, []),
+    play(ia_alphabeta, '\U0001F534').
+
 menu :-
     writeln(''),
     writeln('=============================================='),
@@ -32,11 +39,12 @@ menu :-
     writeln('1. Jouer contre IA Aleatoire'),
     writeln('2. Jouer contre IA Aleatoire Plus'),
     writeln('3. Jouer contre IA Minimax'),
-    writeln('4. SIMULER : Minimax vs Random Plus'),
-    writeln('5. Lancer les tests'),
-    writeln('6. Quitter'),
+    writeln('4. Jouer contre IA Alpha-Beta'),
+    writeln('5. SIMULER : Minimax vs Random Plus'),
+    writeln('6. Lancer les tests'),
+    writeln('7. Quitter'),
     writeln(''),
-    write('Votre choix (1-6) : '),
+    write('Votre choix (1-7) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, Choice),
@@ -58,14 +66,18 @@ handle_choice(3) :-
     menu.
 handle_choice(4) :-
     nl,
-    simulate_ias_custom,
+    init_alphabeta,
     menu.
 handle_choice(5) :-
+    nl,
+    simulate_ias_custom,
+    menu.
+handle_choice(6) :-
     writeln('Chargement des tests...'),
     consult('test_game.pl'),
     run_tests,
     menu.
-handle_choice(6) :-
+handle_choice(7) :-
     writeln('Au revoir!').
 handle_choice(_) :-
     writeln('Choix invalide!'),
@@ -77,13 +89,15 @@ get_ia_choice(Prompt, IA_Module) :-
     writeln('1. ia_random'),
     writeln('2. ia_random_plus'),
     writeln('3. ia_minimax'),
-    write('Votre choix (1-3) : '),
+    writeln('4. ia_alphabeta (alpha-beta)'),
+    write('Votre choix (1-4) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, Choice)
     ->  (   Choice = 1 -> IA_Module = ia_random
         ;   Choice = 2 -> IA_Module = ia_random_plus
         ;   Choice = 3 -> IA_Module = ia_minimax
+        ;   Choice = 4 -> IA_Module = ia_alphabeta
         ;   writeln('Choix invalide.'),
             get_ia_choice(Prompt, IA_Module)
         )
