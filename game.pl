@@ -1,6 +1,7 @@
 :- module(game, [
     init_game/1,
     play/2,
+    play_hvh/1,
     play_move/4,
     test_win/4,
     match_nul/1,
@@ -134,5 +135,27 @@ play_loop(Board, Player, IAModule) :-
         ->  format('~w gagne !~n', [Player])
         ;   change_player(Player, NextPlayer),
             play_loop(NewBoard, NextPlayer, IAModule)
+        )
+    ).
+
+play_hvh(FirstPlayer) :-
+    init_game(Board),
+    display_board(Board),
+    play_loop_hvh(Board, FirstPlayer).
+
+play_loop_hvh(Board, Player) :-
+    (   match_nul(Board)
+    ->  writeln('Match nul !')
+    ;   format('Tour de ~w~n', [Player]),
+        human_move(Board, Move),
+        play_move(Board, Move, NewBoard, Player),
+        nth0(Move, NewBoard, ColumnAfter),
+        length(ColumnAfter, H),
+        Row is H - 1,
+        display_board(NewBoard),
+        (   test_win(NewBoard, Player, Move, Row)
+        ->  format('~w gagne !~n', [Player])
+        ;   change_player(Player, NextPlayer),
+            play_loop_hvh(NewBoard, NextPlayer)
         )
     ).

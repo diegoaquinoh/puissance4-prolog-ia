@@ -23,6 +23,12 @@ init_minimax :-
     use_module(ia_minimax, []),
     play(ia_minimax, '\U0001F534').
 
+init_hvh :-
+    writeln('=== Puissance 4 - Humain vs Humain ==='),
+    writeln('Joueur 1: \U0001F534 (rouge) - Joueur 2: \U0001F7E1 (jaune)'),
+    nl,
+    play_hvh('\U0001F534').
+
 menu :-
     writeln(''),
     writeln('=============================================='),
@@ -32,9 +38,10 @@ menu :-
     writeln('1. Jouer contre IA Aleatoire'),
     writeln('2. Jouer contre IA Aleatoire Plus'),
     writeln('3. Jouer contre IA Minimax'),
-    writeln('4. SIMULER : Minimax vs Random Plus'),
-    writeln('5. Lancer les tests'),
-    writeln('6. Quitter'),
+    writeln('4. Jouer Humain vs Humain'),
+    writeln('5. SIMULER : Minimax vs Random Plus'),
+    writeln('6. Lancer les tests'),
+    writeln('7. Quitter'),
     writeln(''),
     write('Votre choix (1-6) : '),
     read_line_to_string(user_input, Line),
@@ -58,14 +65,18 @@ handle_choice(3) :-
     menu.
 handle_choice(4) :-
     nl,
-    simulate_ias_custom,
+    init_hvh,
     menu.
 handle_choice(5) :-
+    nl,
+    simulate_ias_custom,
+    menu.
+handle_choice(6) :-
     writeln('Chargement des tests...'),
     consult('test_game.pl'),
     run_tests,
     menu.
-handle_choice(6) :-
+handle_choice(7) :-
     writeln('Au revoir!').
 handle_choice(_) :-
     writeln('Choix invalide!'),
