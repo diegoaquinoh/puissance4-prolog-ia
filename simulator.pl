@@ -1,4 +1,4 @@
-:- module(ia_simulator, [run_simulation/3]).
+:- module(ia_simulator, [run_simulation/3, run_simulation/5]).
 
 :- use_module(game, [
     init_game/1, 
@@ -12,10 +12,43 @@
 :- use_module(ia_random_plus, []).
 :- use_module(ia_minimax, []).
 
+% Compatibilité : ancien run_simulation/3 appelle la nouvelle version sans profondeurs
+run_simulation(N, IA1, IA2) :-
+    run_simulation(N, IA1, IA2, none, none).
+
+% run_simulation/5 : N parties, IA1, IA2, DAopt (depth pour IA1) et DBopt (depth pour IA2)
+run_simulation(N, IA1, IA2, DAopt, DBopt) :-
+    ( N mod 2 =:= 0 -> N_demi is N // 2 ; N_demi is (N - 1) // 2 ),
+    TotalParties is N_demi * 2,
+    
+    % Partie 1 : IA1 commence -> IA1 = ROUGE, IA2 = JAUNE
+    ( IA1 == ia_minimax -> ensure_depth_for('\U0001F534', DAopt) ; true ),
+    ( IA2 == ia_minimax -> ensure_depth_for('\U0001F7E1', DBopt) ; true ),
+
+    get_current_depth('\U0001F534', DRed1),
+    get_current_depth('\U0001F7E1', DYellow1),
+    format('Profondeurs (Part 1) -> Rouge: ~w, Jaune: ~w~n', [DRed1, DYellow1]),
+
+    format('--- ~w vs ~w (Part 1 : ~w commence) ---~n', [IA1, IA2, IA1]),
+    simuler_parties(N_demi, IA1, IA2, Res1),
+
+    % Partie 2 : IA2 commence -> on réaffecte les profondeurs (ROUGE=DBopt, JAUNE=DAopt)
+    ( IA2 == ia_minimax -> ensure_depth_for('\U0001F534', DBopt) ; true ),
+    ( IA1 == ia_minimax -> ensure_depth_for('\U0001F7E1', DAopt) ; true ),
+
+    get_current_depth('\U0001F534', DRed2),
+    get_current_depth('\U0001F7E1', DYellow2),
+    format('Profondeurs (Part 2) -> Rouge: ~w, Jaune: ~w~n', [DRed2, DYellow2]),
+
+    format('--- ~w vs ~w (Part 2 : ~w commence) ---~n', [IA2, IA1, IA2]),
+    simuler_parties(N_demi, IA2, IA1, Res2),
+
+    aggr_resultats(Res1, Res2, VicIA1, VicIA2, Nuls),
+    ecrire_stats(TotalParties, IA1, IA2, VicIA1, VicIA2, Nuls).
 
 % --- Prédicats de Jeu pour la Simulation ---
 
-% Le ModuleIA1 joue en premier (symbole ROUGE par convention dans votre code)
+% Le ModuleIA1 joue en premier
 joue_partie(IA1, IA2, GagnantModule) :-
     init_game(BoardInit),
     J1Symbole = '\U0001F534', % Rouge
@@ -24,13 +57,13 @@ joue_partie(IA1, IA2, GagnantModule) :-
     % On simule une partie entre les deux ias
     simuler_boucle(BoardInit, J1Symbole, IA1, IA2, GagnantSymbole),
 
-    % On associe le symbole gagnant à son module d'IA
+    % On associe le symbole gagnant à son module d IA
     (   GagnantSymbole = J1Symbole -> GagnantModule = IA1
     ;   GagnantSymbole = J2Symbole -> GagnantModule = IA2
     ;   GagnantModule = nul
     ).
 
-% Player est le symbole du joueur dont c'est le tour.
+% Player est le symbole du joueur dont c est le tour.
 simuler_boucle(Board, Player, IA1, IA2, Gagnant) :-
     (   match_nul(Board)
     ->  Gagnant = nul
@@ -40,7 +73,7 @@ simuler_boucle(Board, Player, IA1, IA2, Gagnant) :-
         ;   CurrentIA = IA2 
         ),
 
-        % appel de l'ia pour choisir le coup
+        % appel de l ia pour choisir le coup
         CurrentIA:ia(Board, Move, Player),
         play_move(Board, Move, NewBoard, Player),
         
@@ -57,24 +90,6 @@ simuler_boucle(Board, Player, IA1, IA2, Gagnant) :-
     ).
 
 % --- Prédicats de Simulation et de Statistiques ---
-
-% Lance N parties en alternant les joueurs et affiche les résultats.
-run_simulation(N, IA1, IA2) :-
-    % S'assurer que N est pair (en soit déjà fait lors de la sélection)
-    ( N mod 2 =:= 0 -> N_demi is N // 2 ; N_demi is (N - 1) // 2 ),
-    TotalParties is N_demi * 2,
-    
-    % Première moitié des parties avec IA1 qui commence (IA1=Rouge, IA2=Jaune)
-    format('--- ~w vs ~w (Part 1 : ~w commence) ---~n', [IA1, IA2, IA1]),
-    simuler_parties(N_demi, IA1, IA2, Res1),
-
-    % IA2 commence N/2 fois (IA2=Rouge, IA1=Jaune)
-    format('--- ~w vs ~w (Part 2 : ~w commence) ---~n', [IA2, IA1, IA2]),
-    simuler_parties(N_demi, IA2, IA1, Res2),
-
-    % On interprète les résultats
-    aggr_resultats(Res1, Res2, VicIA1, VicIA2, Nuls),
-    ecrire_stats(TotalParties, IA1, IA2, VicIA1, VicIA2, Nuls).
 
 % IA1 joue avec le rouge (joueur 1) et IA2 avec le jaune (joueur 2) pour Count parties.
 % Resultats est un terme res(VicIA1, VicIA2, Nuls)
@@ -134,3 +149,16 @@ ecrire_stats(NombreParties, IA1, IA2, VicIA1, VicIA2, Nuls) :-
     format('Victoires ~w : ~w (~2f%%)~n', [IA2, VicIA2, PourcIA2]),
     format('Parties nulles : ~w (~2f%%)~n', [Nuls, PourcNuls]),
     format('======================================================~n').
+
+% s assure qu une profondeur est affectée pour un symbole (none => profondeur par défaut)
+ensure_depth_for(Symbol, Opt) :-
+    ( Opt == none
+    -> ( ia_minimax:minimax_depth_default(D) -> ia_minimax:set_depth_for(Symbol, D) ; true )
+    ;  integer(Opt) -> ia_minimax:set_depth_for(Symbol, Opt)
+    ).
+
+% récupère la profondeur effective pour affichage/debug
+get_current_depth(Symbol, Depth) :-
+    ( ia_minimax:minimax_depth(Symbol, Depth) -> true
+    ; ia_minimax:minimax_depth_default(Depth) -> true
+    ; Depth = 4 ).

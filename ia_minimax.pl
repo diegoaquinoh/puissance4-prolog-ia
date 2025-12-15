@@ -1,11 +1,31 @@
-:- module(ia_minimax, [ia/3]).
+:- module(ia_minimax, [ia/3, set_depth/1, set_depth_for/2]).
 
 :- use_module(library(lists)).
 :- use_module(game).
 
+:- dynamic minimax_depth_default/1.
+:- dynamic minimax_depth/2. % minimax_depth(PlayerSymbol, Depth)
+minimax_depth_default(4).
+
+% règle la profondeur par défaut (utilisée si aucune profondeur spécifique au joueur n est définie)
+set_depth(D) :-
+    integer(D), D >= 1,
+    retractall(minimax_depth_default(_)),
+    assertz(minimax_depth_default(D)).
+
+% règle la profondeur pour un joueur (symbole Unicode '\U0001F534' ou '\U0001F7E1')
+set_depth_for(Player, D) :-
+    (Player = '\U0001F534' ; Player = '\U0001F7E1'),
+    integer(D), D >= 1,
+    retractall(minimax_depth(Player, _)),
+    assertz(minimax_depth(Player, D)).
+
 ia(Board, Col, Player) :-
-    Depth = 4,
-    minimax(Board, Player, Depth, _Score, BestCol),
+    (   minimax_depth(Player, Depth)
+    ->  true
+    ;   (minimax_depth_default(Depth) -> true ; Depth = 4)
+    ),
+    minimax(Board, Player, Player, Depth, _Score, BestCol),
     (   BestCol =:= -1
     ->  findall(C, legal_move(Board, C), [Col|_])
     ;   Col = BestCol
@@ -15,26 +35,26 @@ ia(Board, Col, Player) :-
 board_full(Board) :-
     match_nul(Board).
 
-minimax(Board, _Player, Depth, Score, -1) :-
+minimax(Board, RootPlayer, _CurrentPlayer, Depth, Score, -1) :-
     (   Depth =:= 0
     ;   win_player(Board, '\U0001F534')
     ;   win_player(Board, '\U0001F7E1')
     ;   board_full(Board)
     ),
-    eval_board(Board, Score),
+    eval_board(Board, RootPlayer, Score),
     !.
 
-minimax(Board, Player, Depth, BestScore, BestCol) :-
+minimax(Board, RootPlayer, CurrentPlayer, Depth, BestScore, BestCol) :-
     Depth > 0,
     Depth1 is Depth - 1,
     findall(Score-Col,
-            (   legal_move(Board, Col),
-                play_move(Board, Col, NextBoard, Player),
-                change_player(Player, NextPlayer),
-                minimax(NextBoard, NextPlayer, Depth1, Score, _)
-            ),
-            MovesScores),
-    (   Player = '\U0001F534'
+        (   legal_move(Board, Col),
+            play_move(Board, Col, NextBoard, CurrentPlayer),
+            change_player(CurrentPlayer, NextPlayer),
+            minimax(NextBoard, RootPlayer, NextPlayer, Depth1, Score, _)
+        ),
+        MovesScores),
+    (   CurrentPlayer = RootPlayer
     ->  best_max(MovesScores, BestScore, BestCol)
     ;   best_min(MovesScores, BestScore, BestCol)
     ).
@@ -55,12 +75,13 @@ best_min([S-C|Rest], BestScore, BestCol) :-
     ;   BestScore = CurScore, BestCol = CurCol
     ).
 
-eval_board(Board, Score) :-
-    (   win_player(Board, '\U0001F534')
+eval_board(Board, RootPlayer, Score) :-
+    (   win_player(Board, RootPlayer)
     ->  Score = 100000
-    ;   win_player(Board, '\U0001F7E1')
+    ;   change_player(RootPlayer, Opp),
+        win_player(Board, Opp)
     ->  Score = -100000
-    ;   heuristic(Board, Score)
+    ;   heuristic(Board, RootPlayer, Score)
     ).
 
 win_player(Board, Player) :-
@@ -69,20 +90,23 @@ win_player(Board, Player) :-
     test_win(Board, Player, Col, Row),
     !.
 
-heuristic(Board, Score) :-
-    findall(Wx,
-            (   any_cell(Board, '\U0001F534', Col, Row),
-                cell_weight(Row, Col, Wx)
-            ),
-            Lx),
-    sum_list(Lx, SX),
-    findall(Wo,
-            (   any_cell(Board, '\U0001F7E1', Col2, Row2),
-                cell_weight(Row2, Col2, Wo)
-            ),
-            Lo),
-    sum_list(Lo, SO),
-    Score is SX - SO.
+heuristic(Board, RootPlayer, Score) :-
+    findall(W1,
+        (   any_cell(Board, RootPlayer, Col, Row),
+            cell_weight(Row, Col, W1)
+        ),
+        L1),
+    sum_list(L1, S1),
+
+    change_player(RootPlayer, Opp),
+    findall(W2,
+        (   any_cell(Board, Opp, Col2, Row2),
+            cell_weight(Row2, Col2, W2)
+        ),
+        L2),
+    sum_list(L2, S2),
+
+    Score is S1 - S2.
 
 any_cell(Board, Player, Col, Row) :-
     nth0(Col, Board, Column),

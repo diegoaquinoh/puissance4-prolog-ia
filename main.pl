@@ -43,7 +43,7 @@ menu :-
     writeln('6. Lancer les tests'),
     writeln('7. Quitter'),
     writeln(''),
-    write('Votre choix (1-6) : '),
+    write('Votre choix (1-7) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, Choice),
@@ -112,14 +112,41 @@ simulate_ias_custom :-
     get_ia_choice('A (Rouge)', IA_A),
     get_ia_choice('B (Jaune)', IA_B),
     
+    % Si au moins une IA choisie est ia_minimax, charger le module et demander la profondeur pour chacune.
+    % On stocke DAopt/DBopt (none si non applicable) et on laisse la simulation appliquer les mappings
+    (   (IA_A = ia_minimax ; IA_B = ia_minimax)
+    ->  use_module(ia_minimax, []),
+        (   IA_A = ia_minimax
+        ->  write('Profondeur du Minimax pour IA A (Rouge) (entier >= 1) : '),
+            read_line_to_string(user_input, LineDA),
+            normalize_space(atom(AtomDA), LineDA),
+            (   atom_number(AtomDA, DA), integer(DA), DA >= 1
+            ->  DAopt = DA
+            ;   writeln('Profondeur invalide.'), simulate_ias_custom
+            )
+        ;   DAopt = none
+        ),
+        (   IA_B = ia_minimax
+        ->  write('Profondeur du Minimax pour IA B (Jaune) (entier >= 1) : '),
+            read_line_to_string(user_input, LineDB),
+            normalize_space(atom(AtomDB), LineDB),
+            (   atom_number(AtomDB, DB), integer(DB), DB >= 1
+            ->  DBopt = DB
+            ;   writeln('Profondeur invalide.'), simulate_ias_custom
+            )
+        ;   DBopt = none
+        )
+    ;   DAopt = none, DBopt = none
+    ),
+    
     write('Nombre de parties simulées (nombre pair pour faire commencer autant de fois chaque ia) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, N),
         integer(N), N >= 2, N mod 2 =:= 0
     ->  writeln('Lancement de la simulation...'),
-        % simulation avec les ias choisis
-        ia_simulator:run_simulation(N, IA_A, IA_B)
+        % simulation avec les ias choisis (on transmet aussi DAopt/DBopt)
+        ia_simulator:run_simulation(N, IA_A, IA_B, DAopt, DBopt)
     ;   writeln('Nombre invalide (doit être un entier pair >= 2).'),
         simulate_ias_custom
     ).
