@@ -1,5 +1,7 @@
 # puissance4-prolog-ia
 
+[![Tests](https://github.com/diegoaquinoh/puissance4-prolog-ia/actions/workflows/tests.yml/badge.svg)](https://github.com/diegoaquinoh/puissance4-prolog-ia/actions/workflows/tests.yml)
+
 Jeu de Puissance 4 en Prolog avec différentes IAs.
 
 ## Architecture modulaire
@@ -59,3 +61,27 @@ swipl -s main.pl -g "use_module(benchmark), benchmark:full_benchmark(ia_alphabet
 ```
 
 Pour plus de détails sur le benchmarking et les résultats, consultez [BENCHMARK_GUIDE.md](BENCHMARK_GUIDE.md).
+
+## Tests
+### Exécuter tous les tests en local
+
+```bash
+./run_tests.sh
+```
+
+### Exécuter les tests individuellement
+
+**Tests du moteur de jeu :**
+```bash
+swipl -s main.pl -g "consult('test_game.pl'), run_tests, halt"
+```
+
+**Tests des algorithmes minimax/alpha-beta :**
+```bash
+swipl -s main.pl -g "consult('test_minimax.pl'), run_tests, halt"
+```
+
+### Intégration Continue (CI)
+
+Les tests sont automatiquement exécutés sur GitHub Actions à chaque push/pull request.
+Voir [.github/workflows/tests.yml](.github/workflows/tests.yml) pour la configuration.

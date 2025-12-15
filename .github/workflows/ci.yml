@@ -1,0 +1,44 @@
+name: Tests Prolog
+
+on:
+  push:
+    branches: [ main, essai_amelioration_heuristique ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v4
+    
+    - name: Installation de SWI-Prolog
+      run: |
+        sudo apt-add-repository ppa:swi-prolog/stable -y
+        sudo apt-get update
+        sudo apt-get install -y swi-prolog
+    
+    - name: Vérification de la version
+      run: swipl --version
+    
+    - name: Exécution des tests game.pl
+      run: |
+        echo "=== Tests game.pl ==="
+        swipl -s main.pl -g "consult('test_game.pl'), run_tests, halt" || exit 1
+    
+    - name: Exécution des tests minimax/alphabeta
+      run: |
+        echo "=== Tests minimax/alphabeta ==="
+        swipl -s main.pl -g "consult('test_minimax.pl'), run_tests, halt" || exit 1
+    
+    - name: Vérification du chargement des modules
+      run: |
+        echo "=== Vérification modules ==="
+        swipl -s main.pl -g "use_module(game), use_module(simulator), use_module(ia_minimax), use_module(ia_alphabeta), writeln('Tous les modules chargés avec succès'), halt"
+    
+    - name: Test rapide de performance
+      run: |
+        echo "=== Test de performance (profondeur 4) ==="
+        swipl -s main.pl -g "use_module(profiling), init_game(B), profiling:compare_node_efficiency(B, '\U0001F534', 4), halt"

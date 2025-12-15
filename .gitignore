@@ -1,0 +1,37 @@
+# Fichiers temporaires Prolog
+*.swp
+*.swo
+*~
+.*.swp
+.*.swo
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+
+# Logs
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Répertoires de build (si jamais utilisés)
+build/
+dist/
+
+# Fichiers IDE
+.vscode/
+.idea/
+*.iml
+
+# Fichiers Python (si scripts auxiliaires)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Fichiers de test temporaires
+test_output/
+*.test
