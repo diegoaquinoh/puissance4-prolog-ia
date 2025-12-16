@@ -23,6 +23,13 @@ init_minimax :-
     use_module(ia_minimax, []),
     play(ia_minimax, '\U0001F534').
 
+init_minimax_smart :-
+    writeln('=== Puissance 4 - IA Minimax Smart ==='),
+    writeln('IA Minimax Smart (heuristique avancée): \U0001F534 (rouge) - Humain: \U0001F7E1 (jaune)'),
+    nl,
+    use_module(ia_minimax_smart, []),
+    play(ia_minimax_smart, '\U0001F534').
+
 init_alphabeta :-
     writeln('=== Puissance 4 - IA Minimax ==='),
     writeln('IA Minimax: \U0001F534 (rouge) - Humain: \U0001F7E1 (jaune)'),
@@ -39,12 +46,13 @@ menu :-
     writeln('1. Jouer contre IA Aleatoire'),
     writeln('2. Jouer contre IA Aleatoire Plus'),
     writeln('3. Jouer contre IA Minimax'),
-    writeln('4. Jouer contre IA Alpha-Beta'),
-    writeln('5. SIMULER : Minimax vs Random Plus'),
-    writeln('6. Lancer les tests'),
-    writeln('7. Quitter'),
+    writeln('4. Jouer contre IA Minimax Smart'),
+    writeln('5. Jouer contre IA Alpha-Beta'),
+    writeln('6. SIMULER : IA vs IA'),
+    writeln('7. Lancer les tests'),
+    writeln('8. Quitter'),
     writeln(''),
-    write('Votre choix (1-7) : '),
+    write('Votre choix (1-8) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, Choice),
@@ -66,18 +74,22 @@ handle_choice(3) :-
     menu.
 handle_choice(4) :-
     nl,
-    init_alphabeta,
+    init_minimax_smart,
     menu.
 handle_choice(5) :-
     nl,
-    simulate_ias_custom,
+    init_alphabeta,
     menu.
 handle_choice(6) :-
+    nl,
+    simulate_ias_custom,
+    menu.
+handle_choice(7) :-
     writeln('Chargement des tests...'),
     consult('test_game.pl'),
     run_tests,
     menu.
-handle_choice(7) :-
+handle_choice(8) :-
     writeln('Au revoir!').
 handle_choice(_) :-
     writeln('Choix invalide!'),
@@ -89,15 +101,17 @@ get_ia_choice(Prompt, IA_Module) :-
     writeln('1. ia_random'),
     writeln('2. ia_random_plus'),
     writeln('3. ia_minimax'),
-    writeln('4. ia_alphabeta (alpha-beta)'),
-    write('Votre choix (1-4) : '),
+    writeln('4. ia_minimax_smart'),
+    writeln('5. ia_alphabeta'),
+    write('Votre choix (1-5) : '),
     read_line_to_string(user_input, Line),
     normalize_space(atom(Atom), Line),
     (   atom_number(Atom, Choice)
     ->  (   Choice = 1 -> IA_Module = ia_random
         ;   Choice = 2 -> IA_Module = ia_random_plus
         ;   Choice = 3 -> IA_Module = ia_minimax
-        ;   Choice = 4 -> IA_Module = ia_alphabeta
+        ;   Choice = 4 -> IA_Module = ia_minimax_smart
+        ;   Choice = 5 -> IA_Module = ia_alphabeta
         ;   writeln('Choix invalide.'),
             get_ia_choice(Prompt, IA_Module)
         )
