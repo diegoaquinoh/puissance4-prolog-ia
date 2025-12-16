@@ -8,7 +8,8 @@
     change_player/2,
     display_board/1,
     human_move/2,
-    get_cell/4
+    get_cell/4,
+    play_hvh/0
 ]).
 
 :- use_module(library(lists)).
@@ -134,5 +135,27 @@ play_loop(Board, Player, IAModule) :-
         ->  format('~w gagne !~n', [Player])
         ;   change_player(Player, NextPlayer),
             play_loop(NewBoard, NextPlayer, IAModule)
+        )
+    ).
+
+play_hvh :-
+    init_game(Board),
+    display_board(Board),
+    play_loop_hvh(Board, '\U0001F534').
+
+play_loop_hvh(Board, Player) :-
+    (   match_nul(Board)
+    ->  writeln('Match nul !')
+    ;   format('Tour de ~w~n', [Player]),
+        human_move(Board, Move),
+        play_move(Board, Move, NewBoard, Player),
+        nth0(Move, NewBoard, ColumnAfter),
+        length(ColumnAfter, H),
+        Row is H - 1,
+        display_board(NewBoard),
+        (   test_win(NewBoard, Player, Move, Row)
+        ->  format('~w gagne !~n', [Player])
+        ;   change_player(Player, NextPlayer),
+            play_loop_hvh(NewBoard, NextPlayer)
         )
     ).
