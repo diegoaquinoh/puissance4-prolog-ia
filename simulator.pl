@@ -11,6 +11,7 @@
 :- use_module(ia_random, []).
 :- use_module(ia_random_plus, []).
 :- use_module(ia_minimax, []).
+:- use_module(ia_minimax_smart, []).
 :- use_module(ia_alphabeta, []).
 :- use_module(ia_negamax, []).
 

@@ -58,6 +58,7 @@ play_move(Board, ColIndex, NewBoard, Player) :-
     append(Column, [Player], NewColumn),
     replace_nth0(ColIndex, Board, NewColumn, NewBoard).
 
+%replace_nth0(Index, List, NewValue, NewList)
 replace_nth0(0, [_|T], X, [X|T]).
 replace_nth0(I, [H|T], X, [H|R]) :-
     I > 0,
