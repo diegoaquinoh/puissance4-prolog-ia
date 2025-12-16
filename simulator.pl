@@ -13,6 +13,7 @@
 :- use_module(ia_minimax, []).
 :- use_module(ia_minimax_smart, []).
 :- use_module(ia_alphabeta, []).
+:- use_module(ia_negamax, []).
 
 
 % --- Prédicats de Jeu pour la Simulation ---

@@ -41,7 +41,7 @@ echo ""
 
 # 3) Vérification chargement modules
 echo -e "${BLUE}[3/5] Vérification chargement modules...${NC}"
-swipl -s main.pl -g "use_module(game), use_module(simulator), use_module(ia_minimax), use_module(ia_alphabeta), use_module(benchmark), use_module(profiling), writeln('OK'), halt" > /dev/null
+swipl -s main.pl -g "use_module(game), use_module(simulator), use_module(ia_minimax), use_module(ia_alphabeta), use_module(ia_negamax), use_module(benchmark), use_module(profiling), writeln('OK'), halt" > /dev/null
 print_result "Chargement modules"
 echo ""
 
