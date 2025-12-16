@@ -35,3 +35,5 @@ venv/
 # Fichiers de test temporaires
 test_output/
 *.test
+
+*.csv
