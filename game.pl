@@ -97,10 +97,13 @@ get_cell(Board, Col, Row, Cell) :-
 
 human_move(Board, Col) :-
     repeat,
-    write('Colonne (0-6) : '),
+    write('Colonne (0-6) ou "quit" pour quitter : '),
     read_line_to_string(user_input, Line0),
     normalize_space(atom(Atom), Line0),
-    (   atom_number(Atom, Col),
+    (   Atom = 'quit'
+    ->  writeln('Retour au menu principal...'),
+        throw(quit_game)
+    ;   atom_number(Atom, Col),
         integer(Col),
         between(0, 6, Col),
         nth0(Col, Board, Column),
@@ -115,9 +118,14 @@ match_nul(Board) :-
     \+ (member(Column, Board), length(Column, L), L < 6).
 
 play(IAModule, FirstPlayer) :-
-    init_game(Board),
-    display_board(Board),
-    play_loop(Board, FirstPlayer, IAModule).
+    catch(
+        (   init_game(Board),
+            display_board(Board),
+            play_loop(Board, FirstPlayer, IAModule)
+        ),
+        quit_game,
+        true  % Si quit_game est lancé, on retourne simplement
+    ).
 
 play_loop(Board, Player, IAModule) :-
     (   match_nul(Board)
@@ -140,9 +148,14 @@ play_loop(Board, Player, IAModule) :-
     ).
 
 play_hvh :-
-    init_game(Board),
-    display_board(Board),
-    play_loop_hvh(Board, '\U0001F534').
+    catch(
+        (   init_game(Board),
+            display_board(Board),
+            play_loop_hvh(Board, '\U0001F534')
+        ),
+        quit_game,
+        true  % Si quit_game est lancé, on retourne simplement
+    ).
 
 play_loop_hvh(Board, Player) :-
     (   match_nul(Board)
