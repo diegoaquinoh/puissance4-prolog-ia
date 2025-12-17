@@ -1,6 +1,7 @@
 # puissance4-prolog-ia
 
-[![Tests](https://github.com/diegoaquinoh/puissance4-prolog-ia/actions/workflows/tests.yml/badge.svg)](https://github.com/diegoaquinoh/puissance4-prolog-ia/actions/workflows/tests.yml)
+H34
+Diego AQUINO, COUPEY Zélie, KAHWATI Saria, VANNESTE Nathan, LEMSEFFER Mohammed, SAUCÉ Marc, Tora KAIJSER, Elijah SIMKIN, Erwann HEQUET
 
 Jeu de Puissance 4 en Prolog avec différentes IAs.
 
@@ -11,12 +12,16 @@ Le projet est organisé de manière modulaire pour éviter la duplication de cod
 - **`game.pl`** : Logique métier du jeu (plateau, affichage, règles, détection de victoire)
 - **`ia_random.pl`** : IA qui joue au hasard
 - **`ia_random_plus.pl`** : IA améliorée qui gagne quand c'est possible et bloque l'adversaire
-- **`ia_minimax.pl`** : IA minimax avec évaluation heuristique (profondeur 4)
-- **`ia_alphabeta.pl`** : IA alpha-beta avec évaluation heuristique (profondeur 4)
+- **`ia_minimax.pl`** : IA minimax avec évaluation heuristique simple (profondeur 4)
+- **`ia_alphabeta.pl`** : IA alpha-beta avec évaluation heuristique simple (profondeur 6)
+- **`ia_minimax_smart.pl`** : IA minimax avec évaluation heuristique avancée (profondeur 4)
+- **`ia_alphabeta_smart.pl`** : IA alpha-beta avec évaluation heuristique avancée(profondeur 6)
 - **`simulator.pl`** : Module de simulation pour comparer les IAs
 - **`benchmark.pl`** : Outils de mesure de performance (temps, inférences)
 - **`profiling.pl`** : Outils de comptage de nœuds explorés et pruning
 - **`main.pl`** : Menu interactif pour choisir l'IA
+
+Les fichiers test_* sont relatifs au testing et trace_game.pl pour du debugage utile pour analyser chaque coup choisi par une ia.
 
 ## Lancer une partie
 
@@ -34,11 +39,12 @@ Vous pourrez ensuite choisir l'IA dans un menu interactif.
 - L'humain joue avec 🟡 (jaune)
 - Les cases vides sont représentées par ⚪ (blanc)
 - Entrez un numéro de colonne entre 0 et 6 quand c'est votre tour
-- Pour quitter : `Ctrl+C` puis `a`
+- Pour quitter une partie et retourner au menu : tapez `quit`
+- Pour quitter complètement le programme : `Ctrl+C` puis `a`
 
 ## Personnalisation
 
-Vous pouvez ajuster la profondeur du minimax dans `ia_minimax.pl` en modifiant la valeur de `Depth` dans le prédicat `ia/3`.
+Vous pouvez ajuster la profondeur des algos d'ias en modifiant la valeur de `Depth` dans le prédicat `ia/3`.
 
 ## Mesurer les performances
 
