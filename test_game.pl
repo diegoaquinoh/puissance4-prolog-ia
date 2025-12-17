@@ -17,7 +17,7 @@
  test(play_move) :-
     init_game(Board),
     play_move(Board, 0, NewBoard, '\U0001F534'),
-    nth0(0, NewBoard, Col), Col = ['\U0001F534'].
+    nth0(0, NewBoard, Col), Col = ['\U0001F534'], !.
 
 % Test de la détection de match nul
  test(match_nul_false) :-
@@ -39,13 +39,13 @@
     Board = [
         ['\U0001F534','\U0001F534','\U0001F534','\U0001F534'],[],[],[],[],[],[]
     ],
-    test_win(Board, '\U0001F534', 0, 3).
+    test_win(Board, '\U0001F534', 0, 3), !.
 
 % Test de la détection de victoire verticale
  test(win_vertical) :-
     Board = [
         ['\U0001F534'],['\U0001F534'],['\U0001F534'],['\U0001F534'],[],[],[]
     ],
-    test_win(Board, '\U0001F534', 3, 0).
+    test_win(Board, '\U0001F534', 3, 0), !.
 
 :- end_tests(game).
